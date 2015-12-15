@@ -7,8 +7,8 @@ Development
 Prerequisites
 =============
 
-The Crate Data Java client is developed in Java_ 7, so a working Java
-7 virtual machine installation is required. We recommend using
+The Crate Data Java client is developed in Java_ 8, so a working Java
+8 virtual machine installation is required. We recommend using
 `Oracle's Java`_ on OSX and OpenJDK_ on Linux Systems.
 
 Get the Source

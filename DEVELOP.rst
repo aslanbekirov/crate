@@ -5,10 +5,9 @@ DEVELOPMENT
 Prerequisites
 =============
 
-Crate is written in Java_ 7, so a JDK needs to be installed. On OS X we
-recommend using `Oracle's Java`_ and OpenJDK_ on Linux Systems.
-We recommend installing Java 7 update 55 or later or Java 8 update 20 or later.
-Previous versions of Java 7 can cause data corruption and data loss.
+Crate is written in Java_ 8, so the latest Java 8 update 20 or higher needs
+to be installed. On OS X we recommend using `Oracle's Java`_ and OpenJDK_
+on Linux Systems.
 
 Writing Documentation
 =====================
