@@ -26,50 +26,37 @@ import io.crate.operation.reference.sys.node.NodeOsJvmExpression;
 import org.apache.lucene.util.BytesRef;
 import org.elasticsearch.common.inject.Inject;
 import org.elasticsearch.common.inject.Singleton;
+import org.apache.lucene.util.Constants;
+
+import java.util.StringTokenizer;
 
 @Singleton
 public class JvmVersionSysCheck extends AbstractSysCheck {
 
-    private final NodeOsJvmExpression jvmExpression;
-
     private static final int ID = 6;
-    private static final int JAVA_VERSION = 8;
-    private static final int BUILD_VERSION = 20;
-    private static final String DESCRIPTION = "Crate is running with older Java version" +
+    private static final int MIN_BUILD_VERSION=20;
+    private static final String DESCRIPTION = "Crate is running with deprecated Java version" +
             "Please update to Java 8 (>= updated 20) runtime environment. ";
 
-    @Inject
-    public JvmVersionSysCheck(NodeOsJvmExpression jvmExpression) {
-        super(ID, new BytesRef(DESCRIPTION), Severity.MEDIUM);
-        this.jvmExpression = jvmExpression;
-    }
+    private static int BUILD_VERSION;
+    private static boolean isMinimumJavaVersion;
 
+    public JvmVersionSysCheck() {
+        super(ID, new BytesRef(DESCRIPTION), Severity.MEDIUM);
+    }
 
     @Override
     public boolean validate() {
-        return validate(((BytesRef) jvmExpression.getChildImplementation("version").value()).utf8ToString());
+        isMinimumJavaVersion = validateJavaVersion();
+        return this.isMinimumJavaVersion;
     }
 
 
-    protected boolean validate(String vm_version) {
+    protected boolean validateJavaVersion() {
+        final StringTokenizer st = new StringTokenizer(Constants.JAVA_VERSION, "_");
+        BUILD_VERSION = Integer.parseInt(st.nextToken());
 
-        int build_version = 1;
-        int java_version = 6;
-
-        if(vm_version != null) {
-            build_version = Integer.valueOf(vm_version.split("_")[1]);
-            java_version = Integer.valueOf(vm_version.split("\\.")[1]);
-        }else{
-            return false;
-        }
-
-        if(java_version < JAVA_VERSION)
-            return false;
-        else if(build_version < BUILD_VERSION){
-            return false;
-        }
-
-        return true;
+        return Constants.JRE_IS_MINIMUM_JAVA8 && (BUILD_VERSION >= MIN_BUILD_VERSION);
     }
 
 
