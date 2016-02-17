@@ -29,6 +29,7 @@ import io.crate.metadata.doc.DocTableInfo;
 import io.crate.metadata.settings.CrateSettings;
 import io.crate.metadata.table.SchemaInfo;
 import io.crate.operation.reference.sys.check.checks.SysCheck.Severity;
+import io.crate.operation.reference.sys.node.NodeOsJvmExpression;
 import io.crate.test.integration.CrateUnitTest;
 import org.elasticsearch.cluster.ClusterService;
 import org.elasticsearch.cluster.ClusterState;
@@ -53,6 +54,7 @@ public class SysChecksTest extends CrateUnitTest {
     private static Iterator docSchemaInfoItr = mock(Iterator.class);
     private static SchemaInfo docSchemaInfo = mock(DocSchemaInfo.class);
     private static DocTableInfo docTableInfo = mock(DocTableInfo.class);
+    private static NodeOsJvmExpression jvmExpression = mock(NodeOsJvmExpression.class);
 
     @Test
     public void testMaxMasterNodesCheckWithEmptySetting() {
@@ -208,6 +210,20 @@ public class SysChecksTest extends CrateUnitTest {
         assertThat(recoveryAfterNodesCheck.id(), is(4));
         assertThat(recoveryAfterNodesCheck.severity(), is(Severity.MEDIUM));
         assertThat(recoveryAfterNodesCheck.validate(TimeValue.timeValueMinutes(4), 3, 3), is(false));
+    }
+
+    @Test
+    public void testJvmVersion() {
+
+        JvmVersionSysCheck jvmVersionSysCheck = new JvmVersionSysCheck(jvmExpression);
+
+        assertThat(jvmVersionSysCheck.id(), is(6));
+        assertThat(jvmVersionSysCheck.severity(), is(Severity.MEDIUM));
+        assertThat(jvmVersionSysCheck.validate("1.6.0_60"), is(false));
+        assertThat(jvmVersionSysCheck.validate("1.7.0_15"), is(false));
+        assertThat(jvmVersionSysCheck.validate("1.7.0_67"), is(false));
+        assertThat(jvmVersionSysCheck.validate("1.8.0_15"), is(false));
+        assertThat(jvmVersionSysCheck.validate("1.8.0_71"), is(true));
     }
 
     @SuppressWarnings("unchecked")
