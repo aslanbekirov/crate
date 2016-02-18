@@ -36,7 +36,7 @@ public class JvmVersionSysCheck extends AbstractSysCheck {
     private static final int MIN_UPDATE_VERSION = 20;
     private static final int MIN_MAJOR_VERSION = 8;
     private static final String DESCRIPTION = "Crate is running with "  + Constants.JAVA_VERSION +
-            " java version. Please update to Java 8 (>= updated 20) runtime environment. ";
+            " java version. Please update to Java 8 (>= updated 20) runtime environment.";
 
     public JvmVersionSysCheck() {
         super(ID, new BytesRef(DESCRIPTION), Severity.MEDIUM);
