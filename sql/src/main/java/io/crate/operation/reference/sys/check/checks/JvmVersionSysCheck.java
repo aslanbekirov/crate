@@ -26,6 +26,8 @@ import org.apache.lucene.util.Constants;
 import org.elasticsearch.common.inject.Singleton;
 
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Singleton
 public class JvmVersionSysCheck extends AbstractSysCheck {
@@ -33,8 +35,8 @@ public class JvmVersionSysCheck extends AbstractSysCheck {
     private static final int ID = 6;
     private static final int MIN_UPDATE_VERSION = 20;
     private static final int MIN_MAJOR_VERSION = 8;
-    private static final String DESCRIPTION = "Crate is running with deprecated Java version" +
-            "Please update to Java 8 (>= updated 20) runtime environment. ";
+    private static final String DESCRIPTION = "Crate is running with "  + Constants.JAVA_VERSION +
+            " java version. Please update to Java 8 (>= updated 20) runtime environment. ";
 
     public JvmVersionSysCheck() {
         super(ID, new BytesRef(DESCRIPTION), Severity.MEDIUM);
@@ -46,16 +48,31 @@ public class JvmVersionSysCheck extends AbstractSysCheck {
     }
 
     protected  boolean validateJavaVersion(String javaVersion) {
+
+        Pattern pattern    = Pattern.compile("(^\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)");
+        Matcher matcher    = pattern.matcher(javaVersion);
+
+        if (!matcher.find()) {
+            return false;
+        }
+
         final StringTokenizer st = new StringTokenizer(javaVersion, "_");
         String javaSpecVersion = st.nextToken();
         int javaUpdate = 1;
         if (st.hasMoreTokens()) {
             javaUpdate = Integer.parseInt(st.nextToken());
+        }else{
+            return false;
         }
 
         final StringTokenizer st2 = new StringTokenizer(javaSpecVersion, ".");
         st2.nextToken();
-        int javaMajorVersion = Integer.parseInt(st2.nextToken());
+        int javaMajorVersion = 7;
+        if (st2.hasMoreTokens()) {
+           javaMajorVersion = Integer.parseInt(st2.nextToken());
+        }else {
+            return false;
+        }
 
         return (javaMajorVersion >= MIN_MAJOR_VERSION) && (javaUpdate >= MIN_UPDATE_VERSION);
     }

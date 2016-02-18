@@ -218,6 +218,9 @@ public class SysChecksTest extends CrateUnitTest {
 
         assertThat(jvmVersionSysCheck.id(), is(6));
         assertThat(jvmVersionSysCheck.severity(), is(Severity.MEDIUM));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("javaVersion"), is(false));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("XXX.XXXX"), is(false));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("XXXX_XXXX"), is(false));
         assertThat(jvmVersionSysCheck.validateJavaVersion("1.6.0_13"), is(false));
         assertThat(jvmVersionSysCheck.validateJavaVersion("1.7.0_10"), is(false));
         assertThat(jvmVersionSysCheck.validateJavaVersion("1.8.0_11"), is(false));
