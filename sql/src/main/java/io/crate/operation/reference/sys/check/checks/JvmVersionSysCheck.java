@@ -21,12 +21,9 @@
 
 package io.crate.operation.reference.sys.check.checks;
 
-import io.crate.metadata.ReferenceImplementation;
-import io.crate.operation.reference.sys.node.NodeOsJvmExpression;
 import org.apache.lucene.util.BytesRef;
-import org.elasticsearch.common.inject.Inject;
-import org.elasticsearch.common.inject.Singleton;
 import org.apache.lucene.util.Constants;
+import org.elasticsearch.common.inject.Singleton;
 
 import java.util.StringTokenizer;
 
@@ -34,12 +31,10 @@ import java.util.StringTokenizer;
 public class JvmVersionSysCheck extends AbstractSysCheck {
 
     private static final int ID = 6;
-    private static final int MIN_BUILD_VERSION=20;
+    private static final int MIN_UPDATE_VERSION = 20;
+    private static final int MIN_MAJOR_VERSION = 8;
     private static final String DESCRIPTION = "Crate is running with deprecated Java version" +
             "Please update to Java 8 (>= updated 20) runtime environment. ";
-
-    private static int BUILD_VERSION;
-    private static boolean isMinimumJavaVersion;
 
     public JvmVersionSysCheck() {
         super(ID, new BytesRef(DESCRIPTION), Severity.MEDIUM);
@@ -47,16 +42,22 @@ public class JvmVersionSysCheck extends AbstractSysCheck {
 
     @Override
     public boolean validate() {
-        isMinimumJavaVersion = validateJavaVersion();
-        return this.isMinimumJavaVersion;
+        return validateJavaVersion(Constants.JAVA_VERSION);
     }
 
+    protected  boolean validateJavaVersion(String javaVersion) {
+        final StringTokenizer st = new StringTokenizer(javaVersion, "_");
+        String javaSpecVersion = st.nextToken();
+        int javaUpdate = 1;
+        if (st.hasMoreTokens()) {
+            javaUpdate = Integer.parseInt(st.nextToken());
+        }
 
-    protected boolean validateJavaVersion() {
-        final StringTokenizer st = new StringTokenizer(Constants.JAVA_VERSION, "_");
-        BUILD_VERSION = Integer.parseInt(st.nextToken());
+        final StringTokenizer st2 = new StringTokenizer(javaSpecVersion, ".");
+        st2.nextToken();
+        int javaMajorVersion = Integer.parseInt(st2.nextToken());
 
-        return Constants.JRE_IS_MINIMUM_JAVA8 && (BUILD_VERSION >= MIN_BUILD_VERSION);
+        return (javaMajorVersion >= MIN_MAJOR_VERSION) && (javaUpdate >= MIN_UPDATE_VERSION);
     }
 
 

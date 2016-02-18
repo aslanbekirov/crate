@@ -211,6 +211,19 @@ public class SysChecksTest extends CrateUnitTest {
         assertThat(recoveryAfterNodesCheck.validate(TimeValue.timeValueMinutes(4), 3, 3), is(false));
     }
 
+    @Test
+    public void testJvmVersion() {
+
+        JvmVersionSysCheck jvmVersionSysCheck = new JvmVersionSysCheck();
+
+        assertThat(jvmVersionSysCheck.id(), is(6));
+        assertThat(jvmVersionSysCheck.severity(), is(Severity.MEDIUM));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("1.6.0_13"), is(false));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("1.7.0_10"), is(false));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("1.8.0_11"), is(false));
+        assertThat(jvmVersionSysCheck.validateJavaVersion("1.8.0_54"), is(true));
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void testNumberOfPartitionCorrectPartitioning() {
