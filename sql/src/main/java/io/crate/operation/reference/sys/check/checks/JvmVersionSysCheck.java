@@ -48,32 +48,20 @@ public class JvmVersionSysCheck extends AbstractSysCheck {
     }
 
     protected  boolean validateJavaVersion(String javaVersion) {
+        int javaUpdate=1;
+        int javaMajorVersion=7;
 
-        Pattern pattern    = Pattern.compile("(^\\d+)\\.(\\d+)\\.(\\d+)_(\\d+)");
-        Matcher matcher    = pattern.matcher(javaVersion);
-
-        if (!matcher.find()) {
-            return false;
-        }
-
-        final StringTokenizer st = new StringTokenizer(javaVersion, "_");
-        String javaSpecVersion = st.nextToken();
-        int javaUpdate = 1;
-        if (st.hasMoreTokens()) {
+        try {
+            final StringTokenizer st = new StringTokenizer(javaVersion, "_");
+            String javaSpecVersion = st.nextToken();
             javaUpdate = Integer.parseInt(st.nextToken());
-        }else{
+
+            final StringTokenizer st2 = new StringTokenizer(javaSpecVersion, ".");
+            st2.nextToken();
+            javaMajorVersion = Integer.parseInt(st2.nextToken());
+        } catch (Exception ex) {
             return false;
         }
-
-        final StringTokenizer st2 = new StringTokenizer(javaSpecVersion, ".");
-        st2.nextToken();
-        int javaMajorVersion = 7;
-        if (st2.hasMoreTokens()) {
-           javaMajorVersion = Integer.parseInt(st2.nextToken());
-        }else {
-            return false;
-        }
-
         return (javaMajorVersion >= MIN_MAJOR_VERSION) && (javaUpdate >= MIN_UPDATE_VERSION);
     }
 
